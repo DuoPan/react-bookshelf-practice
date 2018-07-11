@@ -3,25 +3,20 @@ import React from 'react'
 class Book extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      status: '',
-    }
+    this.status = props.shelf;
   }
 
-  componentWillMount() {
-    if (this.state.status === '') {
-      this.setState({
-        status: this.props.default,
-      });
+  handleSelect = () => event => {
+    const target = event.target.value;
+    this.status = target;
+    const {title, move} = this.props;
+    if (move) {
+      move(title, target);
     }
-  }
-
+  };
 
   render() {
     const {title, url, author} = this.props;
-
-    if (this.state.status !== this.props.shelf)
-      return null;
 
     return (
       <li>
@@ -29,7 +24,7 @@ class Book extends React.Component {
           <div className="book-top">
             <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: url }}></div>
             <div className="book-shelf-changer">
-              <select>
+              <select onChange={this.handleSelect()} value={this.status}>
                 <option value="move" disabled>Move to...</option>
                 <option value="currentlyReading">Currently Reading</option>
                 <option value="wantToRead">Want to Read</option>
