@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link, Route} from 'react-router-dom'
-// import * as BooksAPI from './BooksAPI'
+import * as BooksAPI from './BooksAPI'
 import './App.css'
 import Book from './component/Book'
 
@@ -15,8 +15,9 @@ class BooksApp extends React.Component {
       'The Hobbit': 'read',
       "Oh, the Places You'll Go!": 'read',
       'The Adventures of Tom Sawyer': 'read',
+      books: [],
     };
-
+    
   }
 
   getAllBooks = () => {
@@ -65,6 +66,17 @@ class BooksApp extends React.Component {
     });    
   };
 
+  searchByTitle = () => event => {
+    const sql = event.target.value;
+    if (sql === '')
+      return;
+    Promise.resolve(BooksAPI.search(sql)).then((jsonResults) => {
+      this.setState({
+        books: jsonResults,
+      });
+    });
+  };
+
   render() {
     return (
       <div className="app">
@@ -81,12 +93,24 @@ class BooksApp extends React.Component {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-                <input type="text" placeholder="Search by title or author"/>
-
+                <input type="text" placeholder="Search by title or author" onChange={this.searchByTitle()}/>
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              <ol className="books-grid">
+                {this.state.books.error === undefined && this.state.books.map((item, index) => {
+                  return (
+                    <Book 
+                      key={index}
+                      title={item.title}
+                      author={item.authors}
+                      url={`url("${item.imageLinks.smallThumbnail}")`}
+                      shelf={'none'}
+                      move={this.onMove}
+                    />
+                  )
+                })}
+              </ol>
             </div>
           </div>
         )}/>
@@ -109,6 +133,22 @@ class BooksApp extends React.Component {
                               title={item.title}
                               author={item.author}
                               url={item.url}
+                              shelf={'currentlyReading'}
+                              move={this.onMove}
+                            />
+                          )
+                        } else {
+                          return null;
+                        }
+                      })}
+                      {this.state.books.error === undefined && this.state.books.map((item, index) => {
+                        if (this.state[item.title] === 'currentlyReading') {
+                          return (
+                            <Book 
+                              key={index}
+                              title={item.title}
+                              author={item.author}
+                              url={`url("${item.imageLinks.smallThumbnail}")`}
                               shelf={'currentlyReading'}
                               move={this.onMove}
                             />
@@ -140,6 +180,22 @@ class BooksApp extends React.Component {
                           return null;
                         }
                       })}
+                      {this.state.books.error === undefined && this.state.books.map((item, index) => {
+                        if (this.state[item.title] === 'wantToRead') {
+                          return (
+                            <Book 
+                              key={index}
+                              title={item.title}
+                              author={item.author}
+                              url={`url("${item.imageLinks.smallThumbnail}")`}
+                              shelf={'wantToRead'}
+                              move={this.onMove}
+                            />
+                          )
+                        } else {
+                          return null;
+                        }
+                      })}
                     </ol>
                   </div>
                 </div>
@@ -163,6 +219,22 @@ class BooksApp extends React.Component {
                           return null;
                         }
                       })}
+                       {this.state.books.error === undefined && this.state.books.map((item, index) => {
+                        if (this.state[item.title] === 'read') {
+                          return (
+                            <Book 
+                              key={index}
+                              title={item.title}
+                              author={item.author}
+                              url={`url("${item.imageLinks.smallThumbnail}")`}
+                              shelf={'read'}
+                              move={this.onMove}
+                            />
+                          )
+                        } else {
+                          return null;
+                        }
+                      })}
                     </ol>
                   </div>
                 </div>
@@ -178,6 +250,22 @@ class BooksApp extends React.Component {
                               title={item.title}
                               author={item.author}
                               url={item.url}
+                              shelf={'none'}
+                              move={this.onMove}
+                            />
+                          )
+                        } else {
+                          return null;
+                        }
+                      })}
+                       {this.state.books.error === undefined && this.state.books.map((item, index) => {
+                        if (this.state[item.title] === 'none') {
+                          return (
+                            <Book 
+                              key={index}
+                              title={item.title}
+                              author={item.author}
+                              url={`url("${item.imageLinks.smallThumbnail}")`}
                               shelf={'none'}
                               move={this.onMove}
                             />
