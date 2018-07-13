@@ -5,6 +5,8 @@
 * Practise with BOOK API
 * Practise with state and props
 * Practise with React Life Cycle methods
+* The books can be added to my shelf and removed from, but they are still in the remote library.
+
 
 
 # MyReads Project
