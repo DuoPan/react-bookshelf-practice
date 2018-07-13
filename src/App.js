@@ -43,10 +43,20 @@ class BooksApp extends React.Component {
     });
   }
 
-  onMove = (id, target, title = '', author = '', url = '') => {
+  onMove = (id, target, title, author, url) => {
     this.setState({
       [id]: target,
-    });    
+    });
+    const newBook = {
+      id: id,
+      shelf: target,
+      title: title,
+      authors: [author],
+      imageLinks: {
+        smallThumbnail: url,
+      } 
+    };
+    BooksAPI.update(newBook, target);
   };
 
   onAdd = (id, target, title, author, url) => {
@@ -63,10 +73,19 @@ class BooksApp extends React.Component {
     this.setState({
       [id]: target,
     });  
+    const newBook = {
+      id: id,
+      shelf: target,
+      title: title,
+      authors: [author],
+      imageLinks: {
+        smallThumbnail: url,
+      } 
+    };
+    BooksAPI.update(newBook, target);
   };
 
   render() {
-    // console.log(this.books.length);
     return (
       <div className="app">
         <Route path='/search' render={() => (

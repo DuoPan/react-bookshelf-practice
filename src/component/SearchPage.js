@@ -9,9 +9,6 @@ class SearchPage extends React.Component {
     this.searchResults = [];
   }
 
-
-
-
   onMove = (id, target, title, author, url) => {
     this.setState({
       [id]: target,
@@ -39,12 +36,12 @@ class SearchPage extends React.Component {
             title={book.title}
             author={book.authors}
             url={`url("${book.imageLinks ? book.imageLinks.smallThumbnail : 'http://books.google.com/books/content?id=IOejDAAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api'}")`}
-            shelf={'none'}
+            shelf={book.shelf !== undefined ? book.shelf : 'none'}
             move={this.onMove}
           />
         );
         this.setState({
-          [book.id]: 'none',
+          [book.id]: (book.shelf !== undefined ? book.shelf : 'none'),
         });
         return null;
       });
