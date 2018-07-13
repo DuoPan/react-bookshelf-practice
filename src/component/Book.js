@@ -9,9 +9,9 @@ class Book extends React.Component {
   handleSelect = () => event => {
     const target = event.target.value;
     this.status = target;
-    const {title, move} = this.props;
+    const {id, move, title, author, url} = this.props;
     if (move) {
-      move(title, target);
+      move(id, target, title, author, url);
     }
   };
 
