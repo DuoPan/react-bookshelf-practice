@@ -8,7 +8,9 @@ import SearchPage from './component/SearchPage'
 class BooksApp extends React.Component {
   constructor(props) {
     super(props);
-    this.books = [];
+    this.state={
+      books: [],
+    }
   }
 
   shelfDic = () => {
@@ -23,66 +25,66 @@ class BooksApp extends React.Component {
 
   componentDidMount() {
     BooksAPI.getAll().then(books => {
-      books.map((book, index) => {
-        this.books.push(
-          <Book 
-            id={book.id}
-            key={index}
-            title={book.title}
-            author={book.authors}
-            url={`url("${book.imageLinks ? book.imageLinks.smallThumbnail : 'http://books.google.com/books/content?id=IOejDAAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api'}")`}
-            shelf={book.shelf}
-            move={this.onMove}
-          />
+      let temp = [];
+      books.map((book) => {
+        temp.push({
+            id: book.id,
+            title: book.title,
+            author: book.authors,
+            url: `url("${book.imageLinks ? book.imageLinks.smallThumbnail : 'http://books.google.com/books/content?id=IOejDAAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api'}")`,
+            shelf: book.shelf,
+          }
         );
         this.setState({
-          [book.id]: book.shelf,
+          books: temp,
         });
       return null;
       });
     });
   }
 
-  onMove = (id, target, title, author, url) => {
-    this.setState({
-      [id]: target,
+  onMove = (id, target) => {
+    BooksAPI.update({id:id}, target)
+    .then(() => {
+      let newBooks = this.state.books;
+      for (let i = 0; i < newBooks.length; i++) { 
+        if (newBooks[i].id === id) {
+          newBooks[i].shelf = target;
+          break;
+        }
+      }
+      this.setState({
+        books: newBooks,
+      });
     });
-    const newBook = {
-      id: id,
-      shelf: target,
-      title: title,
-      authors: [author],
-      imageLinks: {
-        smallThumbnail: url,
-      } 
-    };
-    BooksAPI.update(newBook, target);
   };
 
-  onAdd = (id, target, title, author, url) => {
-    this.books.push(
-      <Book 
-        id={id}
-        title={title}
-        author={author}
-        url={url}
-        shelf={target}
-        move={this.onMove}
-      />
-    );
-    this.setState({
-      [id]: target,
-    });  
-    const newBook = {
-      id: id,
-      shelf: target,
-      title: title,
-      authors: [author],
-      imageLinks: {
-        smallThumbnail: url,
-      } 
-    };
-    BooksAPI.update(newBook, target);
+  onAdd = (id, target, title, url, author) => {
+    BooksAPI.update({id: id}, target)
+    .then(() => {
+      let i = 0;
+      let newBooks = this.state.books;
+      for (; i < newBooks.length; i++) { 
+        // 如果已经在书架了
+        if (newBooks[i].id === id) {
+          newBooks[i].shelf = target;
+          break;
+        }
+      }
+      // 如果不在书架
+      if (i === newBooks.length) {
+        newBooks.push({
+          id: id,
+          title: title,
+          author: author,
+          url: url,
+          shelf: target,
+        });
+      }
+      this.setState({
+        books: newBooks,
+      });  
+    });
   };
 
   render() {
@@ -91,6 +93,7 @@ class BooksApp extends React.Component {
         <Route path='/search' render={() => (
           <SearchPage
             addBook={this.onAdd}
+            books={this.state.books}
           />
         )}/>
         <Route path='/' exact render={() => (
@@ -106,15 +109,15 @@ class BooksApp extends React.Component {
                       <h2 className="bookshelf-title">{shelf.name}</h2>
                       <div className="bookshelf-books">
                         <ol className="books-grid">
-                          {this.books.map((item, index) => {
-                            if (this.state[item.props.id] === shelf.shelf) {
+                          {this.state.books.map((item, index) => {
+                            if (item.shelf === shelf.shelf) {
                               return (
                                 <Book 
-                                  id={item.props.id}
+                                  id={item.id}
                                   key={index}
-                                  title={item.props.title}
-                                  author={item.props.author}
-                                  url={item.props.url}
+                                  title={item.title}
+                                  author={item.author}
+                                  url={item.url}
                                   shelf={shelf.shelf}
                                   move={this.onMove}
                                 />

@@ -6,13 +6,12 @@ import * as BooksAPI from '../BooksAPI'
 class SearchPage extends React.Component {
   constructor(props) {
     super(props);
-    this.searchResults = [];
+    this.state={
+      searchResults: [],
+    }
   }
 
   onMove = (id, target, title, author, url) => {
-    this.setState({
-      [id]: target,
-    });
     const {addBook} = this.props;
     if (addBook) {
       addBook(id, target, title, author, url);
@@ -20,7 +19,6 @@ class SearchPage extends React.Component {
   };
 
   searchByTitle = () => event => {
-    this.searchResults = [];
     const sql = event.target.value;
     if (sql === '')
       return;
@@ -28,20 +26,31 @@ class SearchPage extends React.Component {
       if (jsonResults.error !== undefined) {
         return;
       }
-      jsonResults.map((book, index) => {
-        this.searchResults.push(
-          <Book 
-            id={book.id}
-            key={index}
-            title={book.title}
-            author={book.authors}
-            url={`url("${book.imageLinks ? book.imageLinks.smallThumbnail : 'http://books.google.com/books/content?id=IOejDAAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api'}")`}
-            shelf={book.shelf !== undefined ? book.shelf : 'none'}
-            move={this.onMove}
-          />
+      let temp = [];
+      jsonResults.map((book) => {
+        temp.push({
+          id: book.id,
+          title: book.title,
+          author: book.authors,
+          url: `url("${book.imageLinks ? book.imageLinks.smallThumbnail : 'http://books.google.com/books/content?id=IOejDAAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api'}")`,
+          }
         );
-        this.setState({
-          [book.id]: (book.shelf !== undefined ? book.shelf : 'none'),
+        this.setState((prevState, props) => {
+          const shelfBooks = props.books;
+          const newSearchBooks = temp.map(searchBook => {
+            const searchBookInshelfBook = shelfBooks.find(
+              shelfBook => shelfBook.id === searchBook.id
+            );
+            return {
+              ...searchBook,
+              shelf: searchBookInshelfBook
+                ? searchBookInshelfBook.shelf
+                : "none"
+            };
+          });
+          return {
+            searchResults: newSearchBooks,
+          };
         });
         return null;
       });
@@ -59,22 +68,18 @@ class SearchPage extends React.Component {
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-              {this.searchResults.map((item, index) => {
-                if (this.state[item.props.id] === 'none') {
-                  return (
-                    <Book 
-                      id={item.props.id}
-                      key={index}
-                      title={item.props.title}
-                      author={item.props.author}
-                      url={item.props.url}
-                      shelf={'none'}
-                      move={this.onMove}
-                    />
-                  );
-                } else {
-                  return null;
-                }
+              {this.state.searchResults.map((item, index) => {
+                return (
+                  <Book 
+                    id={item.id}
+                    key={index}
+                    title={item.title}
+                    author={item.author}
+                    url={item.url}
+                    shelf={item.shelf}
+                    move={this.onMove}
+                  />
+                );
               })}
           </ol>
         </div>
