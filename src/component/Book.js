@@ -47,7 +47,7 @@ Book.propTypes = {
   title: PropTypes.string,
   url: PropTypes.string,
   author: PropTypes.array,
-  move: PropTypes.func,
+  move: PropTypes.func.isRequired,
 };
 
 export default Book

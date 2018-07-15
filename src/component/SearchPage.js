@@ -90,7 +90,7 @@ class SearchPage extends React.Component {
 }
 
 SearchPage.propTypes = {
-  addBook: PropTypes.func,
+  addBook: PropTypes.func.isRequired,
 };
 
 export default SearchPage

@@ -1,8 +1,8 @@
 import React from 'react'
-import {Link, Route} from 'react-router-dom'
+import {Route} from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
-import Book from './component/Book'
+import BookList from './component/BookList'
 import SearchPage from './component/SearchPage'
 
 class BooksApp extends React.Component {
@@ -12,16 +12,6 @@ class BooksApp extends React.Component {
       books: [],
     }
   }
-
-  shelfDic = () => {
-    return (
-      [
-        { shelf: 'currentlyReading', name: 'Currently Reading' },
-        { shelf: 'wantToRead', name: 'Want To Read' },
-        { shelf: 'read', name: 'Read' }
-      ]
-    );
-  };
 
   componentDidMount() {
     BooksAPI.getAll().then(books => {
@@ -97,46 +87,10 @@ class BooksApp extends React.Component {
           />
         )}/>
         <Route path='/' exact render={() => (
-          <div className="list-books">
-            <div className="list-books-title">
-              <h1>MyReads</h1>
-            </div>
-            <div className="list-books-content">
-              <div>
-                {this.shelfDic().map((shelf, index) => {
-                  return (
-                    <div className="bookshelf" key={`shelf_${index}`}>
-                      <h2 className="bookshelf-title">{shelf.name}</h2>
-                      <div className="bookshelf-books">
-                        <ol className="books-grid">
-                          {this.state.books.map((item, index) => {
-                            if (item.shelf === shelf.shelf) {
-                              return (
-                                <Book 
-                                  id={item.id}
-                                  key={index}
-                                  title={item.title}
-                                  author={item.author}
-                                  url={item.url}
-                                  shelf={shelf.shelf}
-                                  move={this.onMove}
-                                />
-                              )
-                            } else {
-                              return null;
-                            }
-                          })}
-                        </ol>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="open-search">
-              <Link to='/search'>Search a book</Link>
-            </div>
-          </div>
+          <BookList 
+            books={this.state.books}
+            move={this.onMove}
+          />
         )}/>
       </div>
     )
