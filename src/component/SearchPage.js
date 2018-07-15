@@ -2,6 +2,7 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import Book from '../component/Book'
 import * as BooksAPI from '../BooksAPI'
+import PropTypes from 'prop-types'
 
 class SearchPage extends React.Component {
   constructor(props) {
@@ -87,5 +88,9 @@ class SearchPage extends React.Component {
     );
   }
 }
+
+SearchPage.propTypes = {
+  addBook: PropTypes.func,
+};
 
 export default SearchPage
